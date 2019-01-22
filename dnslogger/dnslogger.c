@@ -215,10 +215,15 @@ int main(int argc, char *argv[]) {
         if (payload_bytes < 0)   break;
 
         printf("[\"%s\", %u, %ld, ", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), payload_bytes);
-
         parse(buf, payload_bytes);
-
         printf("]\n");
+
+        // Set flags to respond with "No such name"
+        buf[2] = 0x81;
+        buf[3] = 0x83;
+
+        sendto(sock_fd, buf, payload_bytes, 0,
+                (struct sockaddr *)&sa, sa_size);
     }
 
 }
