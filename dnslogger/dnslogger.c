@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <string.h>
+#include <sys/time.h>
 
 #define BUFSIZE 2048
 
@@ -162,6 +163,12 @@ void usage(int rc) {
     exit(rc);
 }
 
+long long timestamp_ms() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec*1000LL + tv.tv_usec/1000;
+}
+
 int main(int argc, char *argv[]) {
     int opt;
     int rcvbuf = 0;
@@ -214,7 +221,7 @@ int main(int argc, char *argv[]) {
         if (payload_bytes == 0)  continue;
         if (payload_bytes < 0)   break;
 
-        printf("[\"%s\", %u, %ld, ", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), payload_bytes);
+        printf("[%lld, \"%s\", %u, %ld, ", timestamp_ms(), inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), payload_bytes);
         parse(buf, payload_bytes);
         printf("]\n");
 
